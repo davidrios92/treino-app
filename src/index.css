@@ -29,12 +29,15 @@ body {
   overscroll-behavior-y: none;
 }
 
-input,
-select,
-textarea,
-button {
-  font: inherit;
-  color: inherit;
+/* In the base layer so Tailwind utilities (text-*, font-*) still win on buttons/inputs. */
+@layer base {
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
 }
 
 /* iOS zooms into inputs below 16px */
@@ -53,17 +56,4 @@ input[type='number']::-webkit-inner-spin-button {
 }
 .pb-safe {
   padding-bottom: max(env(safe-area-inset-bottom), 8px);
-}
-
-@keyframes flash {
-  0%,
-  100% {
-    background: transparent;
-  }
-  50% {
-    background: rgba(182, 242, 74, 0.35);
-  }
-}
-.rest-flash {
-  animation: flash 0.6s ease-in-out 4;
 }

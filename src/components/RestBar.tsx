@@ -5,7 +5,6 @@ import { adjustRest, getRest, onRest, stopRest } from '../lib/timer'
 export default function RestBar() {
   const rest = useSyncExternalStore(onRest, getRest)
   const [now, setNow] = useState(Date.now())
-  const [flash, setFlash] = useState(false)
   const firedFor = useRef<number | null>(null)
 
   useEffect(() => {
@@ -19,11 +18,7 @@ export default function RestBar() {
   useEffect(() => {
     if (rest && remaining <= 0 && firedFor.current !== rest.endAt) {
       firedFor.current = rest.endAt
-      setFlash(true)
-      const t = setTimeout(() => {
-        setFlash(false)
-        stopRest()
-      }, 6000)
+      const t = setTimeout(stopRest, 6000)
       return () => clearTimeout(t)
     }
   }, [rest, remaining])
@@ -36,7 +31,6 @@ export default function RestBar() {
 
   return (
     <>
-      {flash && <div className="rest-flash pointer-events-none fixed inset-0 z-40" />}
       <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+64px)] z-40 px-3">
         <div className={`mx-auto max-w-xl overflow-hidden rounded-2xl border shadow-2xl ${over ? 'border-accent bg-accent text-accent-ink' : 'border-line bg-panel-2'}`}>
           {!over && <div className="h-1 bg-accent transition-all" style={{ width: `${pct}%` }} />}

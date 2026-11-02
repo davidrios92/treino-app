@@ -31,21 +31,51 @@ export default function Workout({ session }: { session: Session }) {
   )
   const [menu, setMenu] = useState(false)
   const elapsed = useElapsed(session.started_at)
+  const [keepGoing, setKeepGoing] = useState(false)
+  const [countdown, setCountdown] = useState<number | null>(null)
 
   useEffect(() => {
     void keepAwake(true)
     return () => void keepAwake(false)
   }, [])
 
+  // Every item has all its required (non-optional) sets checked, in any variant.
+  const allRequiredDone = useMemo(() => {
+    if (!items?.length || !sets) return false
+    return items.every(
+      (it) => new Set(sets.filter((s) => s.item_id === it.id && s.done_at && s.set_index < it.sets).map((s) => s.set_index)).size >= it.sets,
+    )
+  }, [items, sets])
+
+  // Auto-finish a few seconds after the last required set, unless the user opts to keep going.
+  useEffect(() => {
+    if (!allRequiredDone || keepGoing) {
+      setCountdown(null)
+      return
+    }
+    setCountdown(5)
+    const t = setInterval(() => setCountdown((c) => (c == null ? null : Math.max(0, c - 1))), 1000)
+    return () => clearInterval(t)
+  }, [allRequiredDone, keepGoing])
+
+  useEffect(() => {
+    if (countdown === 0) void complete()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countdown])
+
   if (!items || !exercises || !sets) return null
 
   const doneCount = sets.filter((s) => s.done_at).length
   const requiredTotal = items.reduce((n, it) => n + it.sets, 0)
 
-  async function finish() {
-    if (doneCount === 0 && !confirm('No marcaste ninguna serie. ¿Terminar igual?')) return
+  async function complete() {
     stopRest()
     await patch('sessions', session.id, { finished_at: nowIso() })
+  }
+
+  async function finish() {
+    if (doneCount === 0 && !confirm('No marcaste ninguna serie. ¿Terminar igual?')) return
+    await complete()
   }
 
   async function discard() {
@@ -78,7 +108,29 @@ export default function Workout({ session }: { session: Session }) {
         Terminar entrenamiento
       </Btn>
 
-      <RestBar />
+      {countdown != null ? (
+        <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+64px)] z-40 px-3">
+          <div className="mx-auto max-w-xl rounded-2xl border border-accent bg-accent p-4 text-accent-ink shadow-2xl">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-lg font-bold">¡Entrenamiento completo!</div>
+                <div className="text-sm opacity-80">Guardando en {countdown}…</div>
+              </div>
+              <Check size={32} strokeWidth={3} />
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button onClick={() => setKeepGoing(true)} className="rounded-xl bg-accent-ink/10 py-2 text-sm font-medium">
+                Hacer series opcionales
+              </button>
+              <button onClick={() => void complete()} className="rounded-xl bg-accent-ink py-2 text-sm font-semibold text-accent">
+                Guardar ya
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <RestBar />
+      )}
 
       <Sheet open={menu} onClose={() => setMenu(false)} title="Opciones">
         <div className="space-y-2">

@@ -10,7 +10,8 @@ An installable, offline-first web app I built to follow my own 4-day gym program
 
 - **Today screen** — knows the next routine in the A → B → C → D sequence (not tied to weekdays, so a missed day never skips a workout).
 - **Set tracking** — log weight and reps per set with one tap; each set is pre-filled from what I did last time ("Last time: 40×9 · 40×8 · 37.5×8 kg").
-- **Rest timer** — starts automatically when a set is checked, with ±15 s controls. iPhone web apps can't vibrate, so it plays a distinctive chime scheduled on the Web Audio clock and keeps the screen awake with the Wake Lock API.
+- **Rest timer** — starts automatically when a set is checked, with ±15 s controls, and keeps the screen awake with the Wake Lock API. It is intentionally silent: any web audio on iOS interrupts Spotify, and music matters more at the gym.
+- **Auto-finish** — once the last required set is checked, the workout saves itself after a 5-second countdown (with an option to stay for optional sets).
 - **Progress** — weekly training frequency, plus per-exercise charts of top weight, estimated 1RM (Epley) and volume.
 - **50-session cycles** — a counter that prompts me to re-evaluate the program with my trainer after 50 workouts, then starts a new cycle while keeping all history.
 - **Exercise guide** — photos (start/end position), muscles worked, step-by-step cues and common mistakes, and a short (≤ 3 min) technique video for every exercise.

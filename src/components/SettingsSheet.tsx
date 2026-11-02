@@ -1,10 +1,9 @@
 import { useSyncExternalStore } from 'react'
-import { Download, LogOut, RefreshCw, Volume2 } from 'lucide-react'
+import { Download, LogOut, RefreshCw } from 'lucide-react'
 import { db, patch, SYNCED_TABLES } from '../lib/db'
 import { useSettings } from '../lib/logic'
 import { supabase } from '../lib/supabase'
 import { clearLocalData, getSyncStatus, onSyncStatus, syncNow } from '../lib/sync'
-import { testChime } from '../lib/timer'
 import { Btn, Field, Sheet } from './ui'
 
 let snap = getSyncStatus()
@@ -61,16 +60,6 @@ export default function SettingsSheet({ open, onClose, email }: { open: boolean;
             ))}
           </div>
           <span className="mt-1 block text-xs text-mute">Todo se guarda en kg y se convierte al mostrar, así puedes cambiar cuando quieras.</span>
-        </Field>
-
-        <Field label="Sonido del descanso">
-          <Btn kind="ghost" onClick={testChime} className="flex w-full items-center justify-center gap-2">
-            <Volume2 size={18} /> Probar sonido
-          </Btn>
-          <span className="mt-1 block text-xs text-mute">
-            En iPhone las web apps no pueden vibrar: al terminar el descanso suena este aviso y la pantalla parpadea. Durante el entrenamiento la
-            pantalla se mantiene encendida.
-          </span>
         </Field>
 
         <Field label="Sincronización">

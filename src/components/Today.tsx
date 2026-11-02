@@ -15,7 +15,6 @@ import {
   useRoutines,
   useSessions,
 } from '../lib/logic'
-import { unlockAudio } from '../lib/timer'
 import Workout from './Workout'
 import { Btn, Empty } from './ui'
 
@@ -47,7 +46,6 @@ export default function Today() {
 
   async function start() {
     if (!chosen) return
-    unlockAudio()
     await save<Session>('sessions', {
       id: uuid(),
       cycle_id: cycle?.id ?? null,
